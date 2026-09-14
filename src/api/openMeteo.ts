@@ -1,0 +1,146 @@
+import type { City } from '../data/cities'
+
+export type Forecast = {
+  current: {
+    time: string
+    temperature: number
+    apparentTemperature: number
+    humidity: number
+    precipitation: number
+    weatherCode: number
+    windSpeed: number
+  }
+  daily: Array<{
+    date: string
+    weatherCode: number
+    temperatureMax: number
+    temperatureMin: number
+  }>
+  hourly: Array<{
+    time: string
+    temperature: number
+    weatherCode: number
+  }>
+}
+
+type OpenMeteoResponse = {
+  current?: {
+    time: string
+    temperature_2m: number
+    relative_humidity_2m: number
+    apparent_temperature: number
+    precipitation: number
+    weather_code: number
+    wind_speed_10m: number
+  }
+  hourly?: {
+    time: string[]
+    temperature_2m: number[]
+    weather_code: number[]
+  }
+  daily?: {
+    time: string[]
+    weather_code: number[]
+    temperature_2m_max: number[]
+    temperature_2m_min: number[]
+  }
+  error?: boolean
+  reason?: string
+}
+
+const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast'
+
+export class WeatherApiError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'WeatherApiError'
+  }
+}
+
+function parseForecast(data: OpenMeteoResponse): Forecast {
+  const { current, hourly, daily } = data
+
+  if (!current || !hourly || !daily) {
+    throw new WeatherApiError('La API devolvió una respuesta incompleta.')
+  }
+
+  const days = daily.time.map((date, index) => ({
+    date,
+    weatherCode: daily.weather_code[index] ?? 0,
+    temperatureMax: daily.temperature_2m_max[index] ?? 0,
+    temperatureMin: daily.temperature_2m_min[index] ?? 0,
+  }))
+
+  const hours = hourly.time.map((time, index) => ({
+    time,
+    temperature: hourly.temperature_2m[index] ?? 0,
+    weatherCode: hourly.weather_code[index] ?? 0,
+  }))
+
+  return {
+    current: {
+      time: current.time,
+      temperature: current.temperature_2m,
+      apparentTemperature: current.apparent_temperature,
+      humidity: current.relative_humidity_2m,
+      precipitation: current.precipitation,
+      weatherCode: current.weather_code,
+      windSpeed: current.wind_speed_10m,
+    },
+    daily: days.slice(0, 7),
+    hourly: hours,
+  }
+}
+
+export async function fetchForecast(
+  city: City,
+  signal?: AbortSignal,
+): Promise<Forecast> {
+  const params = new URLSearchParams({
+    latitude: String(city.latitude),
+    longitude: String(city.longitude),
+    timezone: 'America/La_Paz',
+    forecast_days: '7',
+    current: [
+      'temperature_2m',
+      'relative_humidity_2m',
+      'apparent_temperature',
+      'precipitation',
+      'weather_code',
+      'wind_speed_10m',
+    ].join(','),
+    hourly: 'temperature_2m,weather_code',
+    daily: 'weather_code,temperature_2m_max,temperature_2m_min',
+  })
+
+  let response: Response
+  try {
+    response = await fetch(`${FORECAST_URL}?${params}`, { signal })
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error
+    }
+    throw new WeatherApiError(
+      'No se pudo conectar con Open-Meteo. Revisa tu conexión e inténtalo de nuevo.',
+    )
+  }
+
+  if (!response.ok) {
+    throw new WeatherApiError(
+      `Open-Meteo respondió con el código ${response.status}. Inténtalo de nuevo en unos momentos.`,
+    )
+  }
+
+  let data: OpenMeteoResponse
+  try {
+    data = (await response.json()) as OpenMeteoResponse
+  } catch {
+    throw new WeatherApiError('No se pudo interpretar la respuesta de la API.')
+  }
+
+  if (data.error) {
+    throw new WeatherApiError(data.reason ?? 'La API reportó un error.')
+  }
+
+  return parseForecast(data)
+}
