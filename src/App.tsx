@@ -7,7 +7,6 @@ import { ErrorState, WeatherSkeleton } from './components/ErrorState'
 import { HourlyForecast } from './components/HourlyForecast'
 import { MetricCard } from './components/MetricCard'
 import { UnitsMenu } from './components/UnitsMenu'
-import { WeatherIcon } from './components/WeatherIcon'
 import { cities, defaultCityId } from './data/cities'
 import { dateKeyFromTime } from './lib/format'
 import {
@@ -16,17 +15,10 @@ import {
   formatWind,
   type UnitSystem,
 } from './lib/units'
+import Logo from './components/logo/Logo'
 
 const forecastCache = new Map<string, Forecast>()
 
-function Logo() {
-  return (
-    <div className="flex items-center gap-2">
-      <WeatherIcon code={0} className="size-8" />
-      <span className="font-heading text-xl font-bold text-neutral-0">Clima Bolivia</span>
-    </div>
-  )
-}
 
 export default function App() {
   const [selectedCityId, setSelectedCityId] = useState(defaultCityId)
@@ -132,6 +124,7 @@ export default function App() {
                 date={dateKeyFromTime(forecast.current.time)}
                 temperature={forecast.current.temperature}
                 weatherCode={forecast.current.weatherCode}
+                isDay={forecast.current.isDay} // nuevo, viene del Forecast parseado
                 units={units}
               />
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">

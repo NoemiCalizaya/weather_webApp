@@ -16,6 +16,8 @@ export function describeWeather(code: number): string {
 export type WeatherIconKind =
   | 'sun'
   | 'sunCloud'
+  | 'moon'      // nuevo
+  | 'moonCloud' // nuevo
   | 'cloud'
   | 'fog'
   | 'drizzle'
@@ -23,9 +25,9 @@ export type WeatherIconKind =
   | 'snow'
   | 'storm'
 
-export function weatherIconKind(code: number): WeatherIconKind {
-  if (code === 0 || code === 1) return 'sun'
-  if (code === 2) return 'sunCloud'
+export function weatherIconKind(code: number, isDay = true): WeatherIconKind {
+  if (code === 0 || code === 1) return isDay ? 'sun' : 'moon'
+  if (code === 2) return isDay ? 'sunCloud' : 'moonCloud'
   if (code === 3) return 'cloud'
   if (code === 45 || code === 48) return 'fog'
   if (code >= 51 && code <= 57) return 'drizzle'

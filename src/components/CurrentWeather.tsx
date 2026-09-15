@@ -9,6 +9,7 @@ type CurrentWeatherProps = {
   date: string
   temperature: number
   weatherCode: number
+  isDay: boolean // nuevo
   units: UnitSystem
 }
 
@@ -17,6 +18,7 @@ export function CurrentWeather({
   date,
   temperature,
   weatherCode,
+  isDay, // nuevo
   units,
 }: CurrentWeatherProps) {
   return (
@@ -39,7 +41,7 @@ export function CurrentWeather({
           <p className="mt-1 text-sm text-neutral-200">{describeWeather(weatherCode)}</p>
         </div>
         <div className="flex items-center gap-5">
-          <WeatherIcon code={weatherCode} className="size-28" />
+          <WeatherIcon code={weatherCode} isDay={isDay} className="size-28" />
           <p className="font-heading text-7xl font-bold tracking-tight text-neutral-0 italic sm:text-8xl">
             {formatDegrees(temperature, units)}
           </p>
