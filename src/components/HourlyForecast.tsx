@@ -86,7 +86,7 @@ export function HourlyForecast({
             className="flex items-center justify-between rounded-lg bg-neutral-700 px-3 py-2"
           >
             <div className="flex items-center gap-3">
-              <WeatherIcon code={hour.weatherCode} className="size-10" />
+              <WeatherIcon code={hour.weatherCode} isDay={hour.isDay} className="size-10" />
               <span className="text-sm font-medium">{formatHour(hour.time)}</span>
             </div>
             <span className="font-medium">{formatDegrees(hour.temperature, units)}</span>

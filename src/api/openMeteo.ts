@@ -9,6 +9,7 @@ export type Forecast = {
     precipitation: number
     weatherCode: number
     windSpeed: number
+    isDay: boolean
   }
   daily: Array<{
     date: string
@@ -20,6 +21,7 @@ export type Forecast = {
     time: string
     temperature: number
     weatherCode: number
+    isDay: boolean // nuevo
   }>
 }
 
@@ -32,11 +34,13 @@ type OpenMeteoResponse = {
     precipitation: number
     weather_code: number
     wind_speed_10m: number
+    is_day: number
   }
   hourly?: {
     time: string[]
     temperature_2m: number[]
     weather_code: number[]
+    is_day: number[]
   }
   daily?: {
     time: string[]
@@ -75,6 +79,7 @@ function parseForecast(data: OpenMeteoResponse): Forecast {
     time,
     temperature: hourly.temperature_2m[index] ?? 0,
     weatherCode: hourly.weather_code[index] ?? 0,
+    isDay: hourly.is_day[index] === 1, // nuevo
   }))
 
   return {
@@ -86,6 +91,7 @@ function parseForecast(data: OpenMeteoResponse): Forecast {
       precipitation: current.precipitation,
       weatherCode: current.weather_code,
       windSpeed: current.wind_speed_10m,
+      isDay: current.is_day === 1,
     },
     daily: days.slice(0, 7),
     hourly: hours,
@@ -108,8 +114,9 @@ export async function fetchForecast(
       'precipitation',
       'weather_code',
       'wind_speed_10m',
+      'is_day'
     ].join(','),
-    hourly: 'temperature_2m,weather_code',
+    hourly: 'temperature_2m,weather_code,is_day',
     daily: 'weather_code,temperature_2m_max,temperature_2m_min',
   })
 

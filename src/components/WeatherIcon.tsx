@@ -3,6 +3,7 @@ import { weatherIconKind, type WeatherIconKind } from '../lib/weatherCodes'
 
 type WeatherIconProps = {
   code: number
+  isDay?: boolean // nuevo, default true
   className?: string
 }
 
@@ -32,14 +33,35 @@ function Cloud({ className }: { className?: string }) {
   )
 }
 
+function Moon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
+      <path
+        d="M40 8a24 24 0 1 0 16 42A20 20 0 0 1 40 8z"
+        fill="#D8D8F0"
+      />
+    </svg>
+  )
+}
+
 const icons: Record<WeatherIconKind, (props: { className?: string }) => ReactNode> = {
   sun: Sun,
+  moon: Moon, // nuevo
   sunCloud: ({ className }) => (
     <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
       <circle cx="40" cy="22" r="10" fill="#FFC14A" />
       <path
         d="M20 50h26c5.5 0 10-4 10-9s-4.5-9-10-9c-1-7-7-12-14-12-8 0-14 6-15 13-5 0-9 4-9 8.5S13 50 18 50h2z"
         fill="#E6E6F0"
+      />
+    </svg>
+  ),
+  moonCloud: ({ className }) => ( // nuevo
+    <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
+      <path d="M42 20a10 10 0 1 0 6 18 8 8 0 0 1-6-18z" fill="#D8D8F0" />
+      <path
+        d="M20 50h26c5.5 0 10-4 10-9s-4.5-9-10-9c-1-7-7-12-14-12-8 0-14 6-15 13-5 0-9 4-9 8.5S13 50 18 50h2z"
+        fill="#B8B8C9"
       />
     </svg>
   ),
@@ -86,7 +108,7 @@ const icons: Record<WeatherIconKind, (props: { className?: string }) => ReactNod
   ),
 }
 
-export function WeatherIcon({ code, className = 'size-16' }: WeatherIconProps) {
-  const Icon = icons[weatherIconKind(code)]
+export function WeatherIcon({ code,  isDay = true, className = 'size-16' }: WeatherIconProps) {
+   const Icon = icons[weatherIconKind(code, isDay)]
   return <Icon className={className} />
 }
