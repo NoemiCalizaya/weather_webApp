@@ -39,17 +39,62 @@ npm run test     # ejecuta los tests con Vitest
 
 No hace falta API key, pero se creó el archivo `.env` para la URL de la API, de modo que un cambio de versión del endpoint (por ejemplo, de `v1` a `v2`) no requiera tocar el código fuente.
 
+### Demo
+
 Aplicación desplegada públicamente en Vercel:
 
 - URL: https://webappboliviaweather.vercel.app/
 
 ## Tecnologías
 
-- **React 19** y **TypeScript**: interfaz y tipado del contrato de la API.
-- **Vite**: entorno de desarrollo y empaquetado.
-- **Tailwind CSS v4**: estilos alineados a la paleta del mockup.
-- **Vitest** y **React Testing Library**: pruebas unitarias de la lógica y los componentes.
-- **Open-Meteo Forecast API**: datos de clima.
+* **React 19** y **TypeScript**: desarrollo de la interfaz y tipado de los datos recibidos desde la API.
+
+* **Vite**: entorno de desarrollo y empaquetado de la aplicación.
+
+* **Tailwind CSS v4**: estilos y diseño responsive, tomando como referencia la paleta y distribución visual del mockup.
+
+* **Vitest** y **React Testing Library**: pruebas unitarias de la lógica y de los componentes de la aplicación.
+
+* **Open-Meteo Forecast API**: obtención de los datos meteorológicos para las capitales departamentales.
+
+* **Vercel**: despliegue de la aplicación en un entorno público y accesible mediante una URL.
+
+---
+
+## Funcionalidades principales
+
+Las funcionalidades principales corresponden a los requerimientos del pronóstico de 7 días:
+
+* Selección de las **9 capitales departamentales de Bolivia**.
+* Pronóstico meteorológico de **7 días**.
+* Para cada día se muestra como mínimo:
+
+  * **Fecha**.
+  * **Temperatura máxima**.
+  * **Temperatura mínima**.
+  * **Condición climática**.
+* Consulta del **clima actual**.
+* Temperatura actual.
+* Selección de un día para consultar su pronóstico por hora.
+* Indicadores visuales durante la carga de información.
+* Manejo de errores de conexión y errores de la API.
+
+---
+
+## Funcionalidades adicionales
+
+Además de los requerimientos principales, se incorporaron las siguientes funcionalidades:
+
+* **Sensación térmica**.
+* **Humedad**.
+* **Velocidad del viento**.
+* **Precipitación**.
+* **Pronóstico por hora**.
+* Actualización del pronóstico horario según la **hora local de Bolivia**.
+* Cambio entre **unidades métricas e imperiales**.
+* Opción para **reintentar** una consulta cuando ocurre un error.
+* **Caché en memoria** para evitar solicitudes innecesarias al cambiar entre ciudades ya consultadas.
+* Diseño **responsive** para diferentes tamaños de pantalla.
 
 ## API utilizada
 
@@ -94,10 +139,11 @@ Es decir, ese endpoint específico requiere una suscripción paga aparte del pla
 
 **Ventajas**
 
-- Respuesta rápida y un solo request por ciudad.
-- Códigos WMO permiten mapear condición e ícono de forma estable, incluyendo variantes de día y de noche mediante el campo `is_day`.
-- Se puede pedir `current`, `daily` y `hourly` en la misma petición.
-- La zona horaria de Bolivia se aplica en el servidor (`America/La_Paz`).
+- Caché en memoria por ciudad: evita realizar nuevamente la misma petición mientras los datos de esa ciudad permanezcan en la caché.
+- Códigos WMO permiten mapear condición e ícono de forma estable, incluyendo variantes de día y de noche mediante el campo is_day.
+- Se puede pedir current, daily y hourly en la misma petición.
+- La zona horaria de Bolivia se aplica en el servidor (America/La_Paz).
+- La interfaz actualiza la selección del pronóstico horario conforme avanza la hora, sin necesidad de recargar la página.
 
 **Limitaciones**
 
@@ -105,19 +151,33 @@ Es decir, ese endpoint específico requiere una suscripción paga aparte del pla
 - La resolución espacial del modelo puede no coincidir exactamente con el centro urbano.
 - No hay autenticación; si el servicio está caído, la app solo puede reintentar.
 - Los textos de condición climática son una interpretación local de los códigos WMO, no un campo de texto que entregue la API directamente.
-- El campo `is_day` solo tiene sentido para datos puntuales (`current` y cada hora de `hourly`); el pronóstico `daily` es un resumen de 24 horas y no distingue día/noche.
+- La caché se mantiene únicamente en memoria, por lo que se pierde al recargar o cerrar la página.
+- Los datos obtenidos de la API no se actualizan automáticamente mediante una nueva petición mientras permanecen en caché; el usuario puede utilizar la opción de reintento para obtener una respuesta nueva.
+- El campo is_day solo tiene sentido para datos puntuales (current y cada hora de hourly); el pronóstico daily es un resumen de 24 horas y no distingue día/noche.
 
 ## Decisiones técnicas
 
-- **Ciudades predefinidas en lugar de buscador**: el enunciado pide las 9 capitales, no búsqueda libre. El selector reemplaza el buscador del mockup y mantiene el mismo lugar visual.
-- **Una petición por ciudad, con caché en memoria**: cambiar de ciudad es inmediato si ya se consultó antes; si falla una, las demás no se ven afectadas.
-- **Lógica de datos extraída a un custom hook (`useForecast`)**: la obtención del pronóstico, el manejo de caché, estado de carga/error y reintento viven en un hook independiente de `App.tsx`, separando la lógica de datos de la capa de presentación. Esto facilita reutilizar la misma lógica si en el futuro se agrega otra vista (por ejemplo, comparar dos ciudades a la vez) sin duplicar código.
-- **URL de la API en variable de entorno**: `VITE_OPEN_METEO_URL` se lee desde `.env` en vez de estar hardcodeada, para poder apuntar a otra versión del endpoint sin modificar el código fuente.
-- **Manejo de errores diferenciado por tipo**: se distinguen fallos de red (sin conexión, timeout), respuestas HTTP no exitosas (leyendo el `reason` que Open-Meteo entrega en sus errores 400) y JSON incompleto o mal formado, cada uno con un mensaje claro para el usuario y un botón de reintento.
-- **Conversión de unidades en el cliente**: se pide todo en métrico y se convierte a imperial en el frontend para no repetir llamadas a la API.
-- **UI en español y zona horaria `America/La_Paz`**: fechas y horas coherentes con Bolivia.
-- **Sin backend**: Vite + fetch directo a Open-Meteo es suficiente y más simple de desplegar.
-- **Pruebas unitarias con Vitest**: se priorizó testear la lógica pura y con mayor riesgo de bugs silenciosos (mapeo de códigos climáticos y parseo/manejo de errores de la API), en lugar de componentes puramente visuales.
+* **Diseño de la interfaz**: elaboré y elegí mockups para la aplicación y los utilicé como referencia para organizar la información, los componentes y la distribución visual de la interfaz. A partir de ellos adapté la interfaz a los requerimientos del enunciado.
+
+* **Ciudades predefinidas en lugar de buscador**: el enunciado pide las 9 capitales, no búsqueda libre. El selector reemplaza el buscador del mockup y mantiene el mismo lugar visual.
+
+* **Una petición por ciudad, con caché en memoria**: cambiar de ciudad es inmediato si ya se consultó antes; si falla una, las demás no se ven afectadas. La caché evita realizar nuevamente la misma petición mientras los datos permanezcan disponibles en memoria.
+
+* **Actualización de la hora para el pronóstico horario**: el pronóstico horario recibido de la API contiene las horas disponibles, pero la interfaz debe dejar de mostrar las horas que ya pasaron. Por ello, el componente mantiene un reloj local que se actualiza periódicamente y utiliza la hora actual de `America/La_Paz` para filtrar las horas mostradas, sin realizar una nueva petición a la API cada vez que cambia la hora.
+
+* **Lógica de datos extraída a un custom hook (****`useForecast`****)**: la obtención del pronóstico, el manejo de caché, estado de carga/error y reintento viven en un hook independiente de `App.tsx`, separando la lógica de datos de la capa de presentación. Esto facilita reutilizar la misma lógica si en el futuro se agrega otra vista (por ejemplo, comparar dos ciudades a la vez) sin duplicar código.
+
+* **URL de la API en variable de entorno**: `VITE_OPEN_METEO_URL` se lee desde `.env` en vez de estar hardcodeada, para poder apuntar a otra versión del endpoint sin modificar el código fuente.
+
+* **Manejo de errores diferenciado por tipo**: se distinguen fallos de red (sin conexión, timeout), respuestas HTTP no exitosas (leyendo el `reason` que Open-Meteo entrega en sus errores 400) y JSON incompleto o mal formado, cada uno con un mensaje claro para el usuario y un botón de reintento.
+
+* **Conversión de unidades en el cliente**: se pide todo en métrico y se convierte a imperial en el frontend para no repetir llamadas a la API.
+
+* **UI en español y zona horaria ****`America/La_Paz`**: fechas y horas coherentes con Bolivia.
+
+* **Sin backend**: Vite + `fetch` directo a Open-Meteo es suficiente y más simple de desplegar.
+
+* **Pruebas unitarias con Vitest**: se priorizó testear la lógica pura y con mayor riesgo de bugs silenciosos (mapeo de códigos climáticos y parseo/manejo de errores de la API), en lugar de componentes puramente visuales.
 
 ## Datos mostrados
 

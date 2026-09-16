@@ -1,8 +1,8 @@
-import type { Forecast } from '../api/openMeteo'
-import { formatWeekdayShort } from '../lib/format'
-import { formatDegrees, type UnitSystem } from '../lib/units'
-import { describeWeather } from '../lib/weatherCodes'
-import { WeatherIcon } from './WeatherIcon'
+import type { Forecast } from '../../api/openMeteo'
+import { formatWeekdayShort } from '../../lib/format'
+import { formatDegrees, type UnitSystem } from '../../lib/units'
+import { describeWeather } from '../../lib/weatherCodes'
+import { WeatherIcon } from '../common/WeatherIcon'
 
 type DailyForecastProps = {
   days: Forecast['daily']

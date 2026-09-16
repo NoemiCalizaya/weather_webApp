@@ -1,4 +1,4 @@
-import { WeatherIcon } from '../../components/WeatherIcon'
+import { WeatherIcon } from './WeatherIcon'
 
 export default function Logo() {
   return (

@@ -1,8 +1,8 @@
-import type { City } from '../data/cities'
-import { formatLongDate } from '../lib/format'
-import { formatDegrees, type UnitSystem } from '../lib/units'
-import { describeWeather } from '../lib/weatherCodes'
-import { WeatherIcon } from './WeatherIcon'
+import type { City } from '../../data/cities'
+import { formatLongDate } from '../../lib/format'
+import { formatDegrees, type UnitSystem } from '../../lib/units'
+import { describeWeather } from '../../lib/weatherCodes'
+import { WeatherIcon } from '../common/WeatherIcon'
 
 type CurrentWeatherProps = {
   city: City

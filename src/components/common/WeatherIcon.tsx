@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { weatherIconKind, type WeatherIconKind } from '../lib/weatherCodes'
+import { weatherIconKind, type WeatherIconKind } from '../../lib/weatherCodes'
 
 type WeatherIconProps = {
   code: number

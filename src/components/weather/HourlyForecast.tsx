@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import type { Forecast } from '../api/openMeteo'
-import { formatHour, formatWeekdayLong } from '../lib/format'
-import { formatDegrees, type UnitSystem } from '../lib/units'
-import { WeatherIcon } from './WeatherIcon'
+import type { Forecast } from '../../api/openMeteo'
+import { formatHour, formatWeekdayLong, currentLaPazTimeKey } from '../../lib/format'
+import { formatDegrees, type UnitSystem } from '../../lib/units'
+import { WeatherIcon } from '../common/WeatherIcon'
 
 type HourlyForecastProps = {
   days: Forecast['daily']
   hours: Forecast['hourly']
   selectedDate: string
-  currentTime: string
   units: UnitSystem
   onSelectDate: (date: string) => void
 }
@@ -17,12 +16,27 @@ export function HourlyForecast({
   days,
   hours,
   selectedDate,
-  currentTime,
   units,
   onSelectDate,
 }: HourlyForecastProps) {
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
+
+  const [currentTimeKey, setCurrentTimeKey] = useState(() =>
+    currentLaPazTimeKey(),
+  )
+
+  useEffect(() => {
+    const updateCurrentTime = () => {
+      setCurrentTimeKey(currentLaPazTimeKey())
+    }
+
+    updateCurrentTime()
+
+    const intervalId = window.setInterval(updateCurrentTime, 60 * 1000)
+
+    return () => window.clearInterval(intervalId)
+  }, [])
 
   useEffect(() => {
     function handleClick(event: MouseEvent) {
@@ -34,11 +48,17 @@ export function HourlyForecast({
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  const isToday = selectedDate === currentTime.slice(0, 10)
+  
+  const isToday = selectedDate === currentTimeKey.slice(0, 10)
+
   const dayHours = hours.filter((hour) => hour.time.startsWith(selectedDate))
+
+  const currentHourKey = currentTimeKey.slice(0, 13)
+
   const upcomingHours = dayHours.filter(
-    (hour) => !isToday || hour.time >= currentTime.slice(0, 13),
+    (hour) => !isToday || hour.time.slice(0, 13) >= currentHourKey,
   )
+
   const visibleHours = (upcomingHours.length > 0 ? upcomingHours : dayHours).slice(0, 8)
 
   return (
