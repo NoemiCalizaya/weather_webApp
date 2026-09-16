@@ -47,3 +47,22 @@ export function formatHour(isoTime: string): string {
 export function dateKeyFromTime(isoTime: string): string {
   return isoTime.slice(0, 10)
 }
+
+export function currentLaPazTimeKey(): string {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/La_Paz',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    hour12: false,
+  }).formatToParts(new Date())
+
+  const values = Object.fromEntries(
+    parts
+      .filter((part) => part.type !== 'literal')
+      .map((part) => [part.type, part.value]),
+  )
+
+  return `${values.year}-${values.month}-${values.day}T${values.hour}`
+}

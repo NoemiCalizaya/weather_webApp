@@ -1,16 +1,16 @@
 import { useMemo, useState } from 'react'
-import { CitySelector } from './components/CitySelector'
-import { CurrentWeather } from './components/CurrentWeather'
-import { DailyForecast } from './components/DailyForecast'
-import { ErrorState, WeatherSkeleton } from './components/ErrorState'
-import { HourlyForecast } from './components/HourlyForecast'
-import { MetricCard } from './components/MetricCard'
-import { UnitsMenu } from './components/UnitsMenu'
+import { CitySelector } from './components/weather/CitySelector'
+import { CurrentWeather } from './components/weather/CurrentWeather'
+import { DailyForecast } from './components/weather/DailyForecast'
+import { ErrorState, WeatherSkeleton } from './components/common/ErrorState'
+import { HourlyForecast } from './components/weather/HourlyForecast'
+import { MetricCard } from './components/common/MetricCard'
+import { UnitsMenu } from './components/common/UnitsMenu'
 import { cities, defaultCityId } from './data/cities'
 import { dateKeyFromTime } from './lib/format'
 import { formatDegrees, formatPrecipitation, formatWind, type UnitSystem } from './lib/units'
 import { useForecast } from './hooks/useForecast'
-import Logo from './components/logo/Logo'
+import Logo from './components/common/Logo'
 
 export default function App() {
   const [selectedCityId, setSelectedCityId] = useState(defaultCityId)
@@ -87,7 +87,6 @@ export default function App() {
               days={forecast.daily}
               hours={forecast.hourly}
               selectedDate={activeDate}
-              currentTime={forecast.current.time}
               units={units}
               onSelectDate={setSelectedDate}
             />

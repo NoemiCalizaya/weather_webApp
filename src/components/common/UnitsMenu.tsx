@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { UnitSystem } from '../lib/units'
+import type { UnitSystem } from '../../lib/units'
 
 type UnitsMenuProps = {
   units: UnitSystem

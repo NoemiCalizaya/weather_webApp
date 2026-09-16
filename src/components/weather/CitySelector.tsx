@@ -1,4 +1,4 @@
-import type { City } from '../data/cities'
+import type { City } from '../../data/cities'
 
 type CitySelectorProps = {
   cities: City[]
