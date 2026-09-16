@@ -52,7 +52,9 @@ type OpenMeteoResponse = {
   reason?: string
 }
 
-const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast'
+// URL configurable por variable de entorno, con fallback por si falta el .env
+const FORECAST_URL =
+  import.meta.env.VITE_OPEN_METEO_URL || 'https://api.open-meteo.com/v1/forecast'
 
 export class WeatherApiError extends Error {
   constructor(message: string) {
@@ -133,6 +135,24 @@ export async function fetchForecast(
   }
 
   if (!response.ok) {
+    let body: OpenMeteoResponse | null = null
+    try {
+      body = (await response.json()) as OpenMeteoResponse
+    } catch {
+      // el body no era JSON válido, seguimos con el mensaje genérico de abajo
+    }
+
+    if (response.status === 400 && body?.reason) {
+      throw new WeatherApiError(`Solicitud inválida: ${body.reason}`)
+    }
+    if (response.status === 404) {
+      throw new WeatherApiError(
+        'El endpoint solicitado no existe. Verifica la URL configurada en las variables de entorno.',
+      )
+    }
+    if (response.status >= 500) {
+      throw new WeatherApiError('El servicio de clima no está disponible. Intenta más tarde.')
+    }
     throw new WeatherApiError(
       `Open-Meteo respondió con el código ${response.status}. Inténtalo de nuevo en unos momentos.`,
     )
@@ -145,9 +165,6 @@ export async function fetchForecast(
     throw new WeatherApiError('No se pudo interpretar la respuesta de la API.')
   }
 
-  if (data.error) {
-    throw new WeatherApiError(data.reason ?? 'La API reportó un error.')
-  }
-
   return parseForecast(data)
+
 }
