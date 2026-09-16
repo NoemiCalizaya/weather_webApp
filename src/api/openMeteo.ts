@@ -133,6 +133,19 @@ export async function fetchForecast(
   }
 
   if (!response.ok) {
+    let body: OpenMeteoResponse | null = null
+    try {
+      body = (await response.json()) as OpenMeteoResponse
+    } catch {
+      // el body no era JSON válido, seguimos con el mensaje genérico de abajo
+    }
+
+    if (response.status === 400 && body?.reason) {
+      throw new WeatherApiError(`Solicitud inválida: ${body.reason}`)
+    }
+    if (response.status >= 500) {
+      throw new WeatherApiError('El servicio de clima no está disponible. Intenta más tarde.')
+    }
     throw new WeatherApiError(
       `Open-Meteo respondió con el código ${response.status}. Inténtalo de nuevo en unos momentos.`,
     )
@@ -145,9 +158,6 @@ export async function fetchForecast(
     throw new WeatherApiError('No se pudo interpretar la respuesta de la API.')
   }
 
-  if (data.error) {
-    throw new WeatherApiError(data.reason ?? 'La API reportó un error.')
-  }
-
   return parseForecast(data)
+
 }

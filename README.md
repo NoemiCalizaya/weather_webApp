@@ -1,6 +1,6 @@
 # Clima Bolivia
 
-Aplicación web para consultar el pronóstico de los próximos 7 días en las 9 capitales departamentales de Bolivia: Sucre, La Paz, Cochabamba, Oruro, Potosí, Tarija, Santa Cruz de la Sierra, Trinidad y Cobija.
+Aplicación web para consultar el pronóstico de los próximos 7 días en las 9 ciudades capitales departamentales de Bolivia: Sucre, La Paz, Cochabamba, Oruro, Potosí, Tarija, Santa Cruz de la Sierra, Trinidad y Cobija.
 
 La interfaz está inspirada en el mockup [Weather Website](https://www.figma.com/design/18vFvNXXcEUyXrpFM3MH99/Weather-Website?node-id=0-1) (Weather Now): fondo oscuro, tarjeta actual con degradado, métricas, grilla de 7 días y panel horario.
 
@@ -25,7 +25,13 @@ npm run preview  # sirve el build localmente
 npm run lint     # ejecuta ESLint
 ```
 
-No hace falta API key ni archivo `.env`.
+No hace falta API key, pero se creó el archivo `.env` para la URL de la api.
+
+Link a la aplicación desplegada públicamente:
+
+Se desplegó en Vercel, es la plataforma de deploy favorita de Next.js. 
+
+- URL: https://webappboliviaweather.vercel.app/
 
 ## Tecnologías
 
@@ -55,12 +61,14 @@ Las coordenadas están fijas en el código porque las 9 ciudades son un conjunto
 
 ## Por qué esta API
 
-Open-Meteo es la fuente indicada en el mockup y cubre el requerimiento de una API pública:
+Open-Meteo es la fuente indicada que cumple los requerimientos principales que se pidió para el desarrollo de la aplicación web y se refleja en el mockup los elementos.
 
 - No requiere clave ni registro.
 - Permite CORS desde el navegador, así que no hace falta un backend.
 - Devuelve pronóstico diario de 7 días (el valor por defecto) con códigos WMO estándar.
 - Es gratuita para uso razonable no comercial.
+
+Cabe mencionar que no se uso la API sugerida, OpenWeather, ya que requiere de una subscripcion pagada, y para este sistema sencillo y de prueba no se requiere un gasto exigente.
 
 ## Ventajas y limitaciones
 
@@ -96,3 +104,32 @@ Por ciudad se muestra:
 - Condición climática (texto + icono)
 - Temperatura actual, sensación térmica, humedad, viento y precipitación
 - Pronóstico por hora del día seleccionado
+
+# AI Usage
+
+## Herramientas de IA utilizadas
+
+Cursor, Claude y ChatGPT
+
+## Uso de la herramientas
+
+Las herramientas de IA se usaron para el desarrollo, investigacion de documentacion sobre el uso de Typescript, tecnologias como react. Ademas de toma de decisiones que API de pronostico usar, que cumpla con los requisitos principales pedidos, correccion de errores, pedir consejos sobre mis decisiones de mantenibilidad y escalabilidad.
+
+## Uso de IA durante el desarrollo
+
+Se uso prompts siguiendo disenos de dos muckups, disenados y elegidos para el desarrollo de la aplicacion, y segun mi perpectiva corregir algunos errores en la aplicaion y cumplir con estandares de calidad de software.
+
+## Revision, correccion o mejora generada o sugerida por la IA
+
+- Manejo de errores: cuando la aplicacion cae, error de red
+- Iconos para el dia y la noche: 
+- Agregar env: por si la verion de la api cambia
+
+## Decisiones para el desarrollo de la aplicacion
+
+Buscar una alternativa de API, que cumpla con los requerimientos, lectura de la documentacion no me resulto muy clara y me apoye en la IA, para agilizar la investigacion y por consecuente el desarrollo.
+Desarrollar y elegir mockups que cumplan tambien con los requerimientos, que sea clara, sencilla y consisa para el usuario.
+
+## Sugerencias de IA no utilizadas
+
+Sobre todo en desarrollo, agregando el env, el uso de hook, para que sea escalable y mantenible segun mi perspectiva.
