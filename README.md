@@ -225,3 +225,11 @@ Al principio no se planeaba usar variables de entorno (dado que Open-Meteo no re
 ## Sugerencias de IA que no utilicé
 
 Se sugirió automatizar la resolución de coordenadas de las ciudades mediante la API de geocoding de Open-Meteo, en lugar de mantenerlas fijas en el código. Se descartó esta opción porque las 9 ciudades son un conjunto cerrado y conocido de antemano: el geocoding dinámico solo agregaría una dependencia externa adicional y un punto de falla más, sin ningún beneficio real para este caso de uso.
+
+---
+
+## Autor
+
+**Noemi Isabel Calizaya Uño**  
+Ingeniera de Sistemas 
+Bolivia
