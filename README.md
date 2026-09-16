@@ -154,7 +154,9 @@ A partir de esa base, se trabajó de forma iterativa con Claude y ChatGPT: se fu
 
 Buscar una alternativa a la API sugerida (OpenWeather) que cumpliera los requerimientos sin costo: la documentación de las distintas opciones no siempre era clara sobre qué endpoints requerían pago, así que se usó la IA para agilizar esa comparación, pero la decisión final y la verificación de que Open-Meteo realmente cubría los 7 días de pronóstico sin autenticación fue un criterio propio.
 
-También requirió criterio propio decidir qué archivos del proyecto necesitaban actualizarse al introducir el campo `is_day`: no era un cambio uniforme para todo el proyecto, sino que dependía de si cada componente mostraba un dato puntual en el tiempo o un resumen agregado.
+También requirió criterio propio decidir qué archivos del proyecto necesitaban actualizarse al introducir el campo is_day: no era un cambio uniforme para todo el proyecto, sino que dependía de si cada componente mostraba un dato puntual en el tiempo o un resumen agregado.
+
+Otro punto que exigió criterio propio fue mejorar la usabilidad de la interfaz más allá de lo generado inicialmente: reorganizar la tarjeta de clima actual para que el ícono, la temperatura y la condición climática quedaran agrupados como una sola unidad visual, agregar las etiquetas de texto "Máx" y "Mín" junto a las temperaturas del pronóstico de 7 días (para que el usuario no tuviera que inferir cuál era cuál solo por el peso visual), y diferenciar el ícono y la descripción del clima según si es de día o de noche.
 
 ## Sugerencias de IA que sí utilicé, inicialmente descartadas
 
