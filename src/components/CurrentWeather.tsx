@@ -38,13 +38,15 @@ export function CurrentWeather({
           <p className="mt-2 text-neutral-200">
             {city.department}, Bolivia · {formatLongDate(date)}
           </p>
-          <p className="mt-1 text-sm text-neutral-200">{describeWeather(weatherCode)}</p>
         </div>
         <div className="flex items-center gap-5">
           <WeatherIcon code={weatherCode} isDay={isDay} className="size-28" />
-          <p className="font-heading text-7xl font-bold tracking-tight text-neutral-0 italic sm:text-8xl">
-            {formatDegrees(temperature, units)}
-          </p>
+          <div className="flex flex-col items-start">
+            <p className="font-heading text-7xl font-bold tracking-tight text-neutral-0 italic sm:text-8xl">
+              {formatDegrees(temperature, units)}
+            </p>
+            <p className="text-lg font-bold text-neutral-0">{describeWeather(weatherCode)}</p>
+          </div>
         </div>
       </div>
     </section>
