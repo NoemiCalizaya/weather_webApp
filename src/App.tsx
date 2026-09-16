@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
-import { fetchForecast, WeatherApiError, type Forecast } from './api/openMeteo'
+import { useMemo, useState } from 'react'
 import { CitySelector } from './components/CitySelector'
 import { CurrentWeather } from './components/CurrentWeather'
 import { DailyForecast } from './components/DailyForecast'
@@ -9,24 +8,12 @@ import { MetricCard } from './components/MetricCard'
 import { UnitsMenu } from './components/UnitsMenu'
 import { cities, defaultCityId } from './data/cities'
 import { dateKeyFromTime } from './lib/format'
-import {
-  formatDegrees,
-  formatPrecipitation,
-  formatWind,
-  type UnitSystem,
-} from './lib/units'
+import { formatDegrees, formatPrecipitation, formatWind, type UnitSystem } from './lib/units'
+import { useForecast } from './hooks/useForecast'
 import Logo from './components/logo/Logo'
-
-const forecastCache = new Map<string, Forecast>()
-
 
 export default function App() {
   const [selectedCityId, setSelectedCityId] = useState(defaultCityId)
-  const [selectedDate, setSelectedDate] = useState<string | null>(null)
-  const [forecast, setForecast] = useState<Forecast | null>(null)
-  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
-  const [errorMessage, setErrorMessage] = useState('')
-  const [retryToken, setRetryToken] = useState(0)
   const [units, setUnits] = useState<UnitSystem>('metric')
 
   const city = useMemo(
@@ -34,37 +21,8 @@ export default function App() {
     [selectedCityId],
   )
 
-  useEffect(() => {
-    const controller = new AbortController()
-
-    void (async () => {
-      await Promise.resolve()
-      const cached = forecastCache.get(city.id)
-      if (!cached) {
-        setStatus('loading')
-        setErrorMessage('')
-      }
-
-      try {
-        const data = cached ?? (await fetchForecast(city, controller.signal))
-        forecastCache.set(city.id, data)
-        setForecast(data)
-        setSelectedDate(data.daily[0]?.date ?? dateKeyFromTime(data.current.time))
-        setStatus('ready')
-      } catch (error: unknown) {
-        if (error instanceof DOMException && error.name === 'AbortError') return
-        const message =
-          error instanceof WeatherApiError
-            ? error.message
-            : 'Ocurrió un error inesperado al obtener el clima.'
-        setErrorMessage(message)
-        setForecast(null)
-        setStatus('error')
-      }
-    })()
-
-    return () => controller.abort()
-  }, [city, retryToken])
+  const { forecast, selectedDate, setSelectedDate, status, errorMessage, retry } =
+    useForecast(city)
 
   const activeDate = selectedDate ?? forecast?.daily[0]?.date ?? ''
 
@@ -84,37 +42,13 @@ export default function App() {
             Pronóstico de 7 días para las 9 capitales departamentales de Bolivia.
           </p>
           <div className="mt-8">
-            <CitySelector
-              cities={cities}
-              selectedId={city.id}
-              onSelect={(id) => {
-                setSelectedCityId(id)
-                const cached = forecastCache.get(id)
-                if (cached) {
-                  setForecast(cached)
-                  setSelectedDate(
-                    cached.daily[0]?.date ?? dateKeyFromTime(cached.current.time),
-                  )
-                  setStatus('ready')
-                } else {
-                  setStatus('loading')
-                }
-              }}
-            />
+            <CitySelector cities={cities} selectedId={city.id} onSelect={setSelectedCityId} />
           </div>
         </section>
 
         {status === 'loading' ? <WeatherSkeleton /> : null}
 
-        {status === 'error' ? (
-          <ErrorState
-            message={errorMessage}
-            onRetry={() => {
-              forecastCache.delete(city.id)
-              setRetryToken((value) => value + 1)
-            }}
-          />
-        ) : null}
+        {status === 'error' ? <ErrorState message={errorMessage} onRetry={retry} /> : null}
 
         {status === 'ready' && forecast ? (
           <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_350px]">
@@ -124,7 +58,7 @@ export default function App() {
                 date={dateKeyFromTime(forecast.current.time)}
                 temperature={forecast.current.temperature}
                 weatherCode={forecast.current.weatherCode}
-                isDay={forecast.current.isDay} // nuevo, viene del Forecast parseado
+                isDay={forecast.current.isDay}
                 units={units}
               />
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">

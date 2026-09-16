@@ -44,10 +44,16 @@ export function DailyForecast({
                   {describeWeather(day.weatherCode)}
                 </p>
                 <div className="mt-3 flex w-full justify-between px-1 text-sm">
-                  <span className="font-medium text-neutral-0">
+                  <span className="flex items-center gap-1 font-medium text-neutral-0">
+                    <span className="text-[10px] uppercase text-neutral-400" aria-hidden="true">
+                      Máx
+                    </span>
                     {formatDegrees(day.temperatureMax, units)}
                   </span>
-                  <span className="text-neutral-300">
+                  <span className="flex items-center gap-1 text-neutral-300">
+                    <span className="text-[10px] uppercase text-neutral-500" aria-hidden="true">
+                      Mín
+                    </span>
                     {formatDegrees(day.temperatureMin, units)}
                   </span>
                 </div>
